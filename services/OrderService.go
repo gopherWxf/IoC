@@ -13,3 +13,11 @@ func NewOrderService(version string) *OrderService {
 func (us *OrderService) GetOrderInfo(uid int) {
 	fmt.Println("获取订单ID=", uid, "的详细信息")
 }
+
+type IOrder interface {
+	Name() string
+}
+
+func (us *OrderService) Name() string {
+	return "order"
+}
