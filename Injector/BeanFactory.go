@@ -55,18 +55,22 @@ func (b *BeanFactoryImpl) Apply(bean interface{}) {
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Type().Field(i)
 		if v.Field(i).CanSet() && field.Tag.Get("inject") != "" {
-			//兼容老方式
-			if field.Tag.Get("inject") == "-" {
-				if getV := b.Get(field.Type); getV != nil {
-					v.Field(i).Set(reflect.ValueOf(getV))
-				}
-			} else {
+			//先看看容器里有没有
+			if getV := b.Get(field.Type); getV != nil {
+				v.Field(i).Set(reflect.ValueOf(getV))
+				continue
+			}
+			//如果没用，看看表达式
+			if field.Tag.Get("inject") != "-" {
 				ret := expr.BeanExpr(field.Tag.Get("inject"), b.ExprMap)
 				if ret != nil && !ret.IsEmpty() {
-					v.Field(i).Set(reflect.ValueOf(ret[0]))
+					retVal := ret[0]
+					if retVal != nil {
+						v.Field(i).Set(reflect.ValueOf(retVal))
+						b.Set(retVal)
+					}
 				}
 			}
-
 		}
 	}
 }
