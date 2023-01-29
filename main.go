@@ -8,6 +8,7 @@ import (
 
 func main() {
 	BeanFactory.Set(services.NewOrderService("1.0"))
-	order := BeanFactory.Get((*services.OrderService)(nil))
-	fmt.Println(order)
+	userService := services.NewUserService()
+	BeanFactory.Apply(userService)
+	fmt.Println(userService.Order)
 }

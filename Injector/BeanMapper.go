@@ -12,7 +12,13 @@ func (bm BeanMapper) add(bean interface{}) {
 	bm[t] = reflect.ValueOf(bean)
 }
 func (bm BeanMapper) get(bean interface{}) reflect.Value {
-	t := reflect.TypeOf(bean)
+	var t reflect.Type
+	if bt, ok := bean.(reflect.Type); ok {
+		t = bt
+	} else {
+		t = reflect.TypeOf(bean)
+	}
+
 	if v, ok := bm[t]; ok {
 		return v
 	}
