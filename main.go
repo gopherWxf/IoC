@@ -9,10 +9,11 @@ import (
 
 func main() {
 	serviceConfig := Config.NewServiceConfig()
-	BeanFactory.ExprMap = map[string]interface{}{
-		"ServiceConfig": serviceConfig,
-	}
-	BeanFactory.Set(serviceConfig)
+	//BeanFactory.ExprMap = map[string]interface{}{
+	//	"ServiceConfig": serviceConfig,
+	//}
+	BeanFactory.Config(serviceConfig)
+	//BeanFactory.Set(serviceConfig)
 
 	userService := services.NewUserService()
 	BeanFactory.Apply(userService)

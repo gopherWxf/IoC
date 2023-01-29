@@ -55,12 +55,7 @@ func (b *BeanFactoryImpl) Apply(bean interface{}) {
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Type().Field(i)
 		if v.Field(i).CanSet() && field.Tag.Get("inject") != "" {
-			//先看看容器里有没有
-			if getV := b.Get(field.Type); getV != nil {
-				v.Field(i).Set(reflect.ValueOf(getV))
-				continue
-			}
-			//如果没用，看看表达式
+			//表达式
 			if field.Tag.Get("inject") != "-" {
 				ret := expr.BeanExpr(field.Tag.Get("inject"), b.ExprMap)
 				if ret != nil && !ret.IsEmpty() {
@@ -70,6 +65,32 @@ func (b *BeanFactoryImpl) Apply(bean interface{}) {
 						b.Set(retVal)
 					}
 				}
+			} else {
+				//-
+				if getV := b.Get(field.Type); getV != nil {
+					v.Field(i).Set(reflect.ValueOf(getV))
+					continue
+				}
+			}
+		}
+	}
+}
+func (b *BeanFactoryImpl) Config(cfgs ...interface{}) {
+	for _, cfg := range cfgs {
+		t := reflect.TypeOf(cfg)
+		if t.Kind() != reflect.Ptr {
+			panic("need ptr")
+		}
+		//把config本身也加入bean
+		b.Set(t)
+		//自动构建ExprMap
+		b.ExprMap[t.Name()] = cfg
+		v := reflect.ValueOf(cfg)
+		for i := 0; i < t.NumMethod(); i++ {
+			method := v.Method(i)
+			callRet := method.Call(nil)
+			if callRet != nil && len(callRet) == 1 {
+				b.Set(callRet[0].Interface())
 			}
 		}
 	}
