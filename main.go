@@ -4,22 +4,14 @@ import (
 	"IoC/Config"
 	. "IoC/Injector"
 	"IoC/services"
-	"fmt"
 )
 
 func main() {
 	serviceConfig := Config.NewServiceConfig()
-	//BeanFactory.ExprMap = map[string]interface{}{
-	//	"ServiceConfig": serviceConfig,
-	//}
 	BeanFactory.Config(serviceConfig)
 	//BeanFactory.Set(serviceConfig)
 
 	userService := services.NewUserService()
 	BeanFactory.Apply(userService)
-	fmt.Println(userService.Order.DB)
-
-	adminService := services.NewAdminService()
-	BeanFactory.Apply(adminService)
-	fmt.Println(adminService.Order)
+	userService.GetUserInfo(98489)
 }

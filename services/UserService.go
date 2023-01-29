@@ -1,9 +1,13 @@
 package services
 
-import "fmt"
+import (
+	"fmt"
+	"gorm.io/gorm"
+)
 
 type UserService struct {
 	Order *OrderService `inject:"-"`
+	DB    *gorm.DB      `inject:"-"`
 }
 
 func NewUserService() *UserService {
@@ -11,5 +15,12 @@ func NewUserService() *UserService {
 }
 
 func (us *UserService) GetUserInfo(uid int) {
-	fmt.Println("获取用户ID=", uid, "的详细信息")
+	user := &UserNodel{}
+	us.DB.Raw("select id,user_id from t_lark_task_1 where id=?", uid).First(user)
+	fmt.Println(user)
+}
+
+type UserNodel struct {
+	ID     int    `gorm:"column:id"`
+	UserID string `gorm:"column:user_id"`
 }
