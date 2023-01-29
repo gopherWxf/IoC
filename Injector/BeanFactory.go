@@ -84,7 +84,7 @@ func (b *BeanFactoryImpl) Config(cfgs ...interface{}) {
 		//把config本身也加入bean
 		b.Set(t)
 		//自动构建ExprMap
-		b.ExprMap[t.Name()] = cfg
+		b.ExprMap[t.Elem().Name()] = cfg
 		v := reflect.ValueOf(cfg)
 		for i := 0; i < t.NumMethod(); i++ {
 			method := v.Method(i)
