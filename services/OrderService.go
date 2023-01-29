@@ -4,6 +4,7 @@ import "fmt"
 
 type OrderService struct {
 	Version string
+	DB      *DBService `inject:"-"`
 }
 
 func NewOrderService(version string) *OrderService {

@@ -63,13 +63,14 @@ func (b *BeanFactoryImpl) Apply(bean interface{}) {
 					if retVal != nil {
 						v.Field(i).Set(reflect.ValueOf(retVal))
 						b.Set(retVal)
+						b.Apply(retVal)
 					}
 				}
 			} else {
 				//-
 				if getV := b.Get(field.Type); getV != nil {
 					v.Field(i).Set(reflect.ValueOf(getV))
-					continue
+					b.Apply(getV)
 				}
 			}
 		}

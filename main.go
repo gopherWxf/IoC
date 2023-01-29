@@ -17,7 +17,7 @@ func main() {
 
 	userService := services.NewUserService()
 	BeanFactory.Apply(userService)
-	fmt.Println(userService.Order)
+	fmt.Println(userService.Order.DB)
 
 	adminService := services.NewAdminService()
 	BeanFactory.Apply(adminService)
