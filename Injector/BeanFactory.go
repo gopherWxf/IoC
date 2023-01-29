@@ -1,6 +1,9 @@
 package Injector
 
-import "reflect"
+import (
+	"github.com/shenyisyn/goft-expr/src/expr"
+	"reflect"
+)
 
 var BeanFactory *BeanFactoryImpl
 
@@ -10,10 +13,11 @@ func init() {
 
 type BeanFactoryImpl struct {
 	beanMapper BeanMapper
+	ExprMap    map[string]interface{}
 }
 
 func NewBeanFactory() *BeanFactoryImpl {
-	return &BeanFactoryImpl{beanMapper: make(BeanMapper)}
+	return &BeanFactoryImpl{beanMapper: make(BeanMapper), ExprMap: make(map[string]interface{})}
 }
 
 func (b *BeanFactoryImpl) Get(v interface{}) interface{} {
@@ -51,9 +55,18 @@ func (b *BeanFactoryImpl) Apply(bean interface{}) {
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Type().Field(i)
 		if v.Field(i).CanSet() && field.Tag.Get("inject") != "" {
-			if getV := b.Get(field.Type); getV != nil {
-				v.Field(i).Set(reflect.ValueOf(getV))
+			//兼容老方式
+			if field.Tag.Get("inject") == "-" {
+				if getV := b.Get(field.Type); getV != nil {
+					v.Field(i).Set(reflect.ValueOf(getV))
+				}
+			} else {
+				ret := expr.BeanExpr(field.Tag.Get("inject"), b.ExprMap)
+				if ret != nil && !ret.IsEmpty() {
+					v.Field(i).Set(reflect.ValueOf(ret[0]))
+				}
 			}
+
 		}
 	}
 }
